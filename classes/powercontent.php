@@ -140,7 +140,7 @@ class nxcPowerContent {
 			$this->updateVisibility( $object, $visibility );
 		}
 
-		$this->debug( '[Created] "' . $object->attribute( 'name' ) . '" (Node ID:' . $object->attribute( 'main_node_id' ) . ')', array( 'green' ) );
+		$this->debug( '[Created] "' . $object->attribute( 'name' ) . '" (Node ID: ' . $object->attribute( 'main_node_id' ) . ')', array( 'green' ) );
 		return $object;
 	}
 
@@ -171,7 +171,12 @@ class nxcPowerContent {
 		$this->debug( 'Starting update "' . $object->attribute( 'name' ) . '" object (class: ' . $object->attribute( 'class_name' ) . ') with remote ID ' . $object->attribute( 'remote_id' ) );
 
 		$visibility = ( isset( $params['visibility'] ) ) ? (bool) $params['visibility'] : true;
-		$parentNode = ( isset( $params['parentNode'] ) ) ? $params['parentNode'] : eZContentObjectTreeNode::fetch( $params['parentNodeID'] );
+		$parentNode = false;
+		if( isset( $params['parentNode'] ) ) {
+			$parentNode = $params['parentNode'];eZContentObjectTreeNode::fetch( $params['parentNodeID'] );
+		} elseif( isset( $params['parentNodeID'] ) ) {
+			$parentNode = eZContentObjectTreeNode::fetch( $params['parentNodeID'] );
+		}
 		if(
 			$parentNode instanceof eZContentObjectTreeNode
 			&& $object->attribute( 'main_node' ) instanceof eZContentObjectTreeNode
@@ -312,7 +317,7 @@ class nxcPowerContent {
 
 				if( $deleteItem['can_remove'] ) {
 					eZContentObjectTreeNode::removeSubtrees( array( $node->attribute( 'node_id' ) ), false );
-					$this->debug( '[Removed] "' . $objectName . '"', array( 'red' ) );
+					$this->debug( '[Removed] "' . $objectName . '", Node ID: ' . $node->attribute( 'node_id' ), array( 'red' ) );
    				}
 			}
 
