@@ -173,7 +173,7 @@ class nxcPowerContent {
 		$visibility = ( isset( $params['visibility'] ) ) ? (bool) $params['visibility'] : true;
 		$parentNode = false;
 		if( isset( $params['parentNode'] ) ) {
-			$parentNode = $params['parentNode'];eZContentObjectTreeNode::fetch( $params['parentNodeID'] );
+			$parentNode = $params['parentNode'];
 		} elseif( isset( $params['parentNodeID'] ) ) {
 			$parentNode = eZContentObjectTreeNode::fetch( $params['parentNodeID'] );
 		}
