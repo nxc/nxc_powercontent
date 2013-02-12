@@ -344,29 +344,38 @@ class nxcPowerContent {
 					case 'ezimage': {
 						$arr      = explode( '|', trim( $value ) );
 						$source   = str_replace( ' ', '%20', $arr[0] );
-						$filename = 'var/cache/'. md5( microtime() ) . substr( $source, strrpos( $source, '.' ) );
 
-						if( !empty( $source ) ) {
-							if( in_array( 'curl', get_loaded_extensions() ) ) {
-								$ch = curl_init();
-								$out = fopen( $filename, 'w' );
-								curl_setopt( $ch, CURLOPT_FOLLOWLOCATION, 1 );
-								curl_setopt( $ch, CURLOPT_URL, $source );
-								curl_setopt( $ch, CURLOPT_RETURNTRANSFER, true );
-								curl_setopt( $ch, CURLOPT_FILE, $out );
-								curl_exec( $ch );
-								curl_close( $ch );
-								fclose( $out );
-							} else {
-								copy( $source, $filename );
-							}
-						}
-
-						if( file_exists( $filename ) ) {
+						if( file_exists( $source ) ) {
+							// Handle local files
 							$content = $attribute->attribute( 'content' );
-							$content->initializeFromFile( $filename, isset( $arr[1] ) ? $arr[1] : null );
+							$content->initializeFromFile( $source, isset( $arr[1] ) ? $arr[1] : null );
 							$content->store( $attribute );
-							unlink( $filename );
+						} else {
+							// Handle remote files
+							$filename = 'var/cache/'. md5( microtime() ) . substr( $source, strrpos( $source, '.' ) );
+
+							if( !empty( $source ) ) {
+								if( in_array( 'curl', get_loaded_extensions() ) ) {
+									$ch = curl_init();
+									$out = fopen( $filename, 'w' );
+									curl_setopt( $ch, CURLOPT_FOLLOWLOCATION, 1 );
+									curl_setopt( $ch, CURLOPT_URL, $source );
+									curl_setopt( $ch, CURLOPT_RETURNTRANSFER, true );
+									curl_setopt( $ch, CURLOPT_FILE, $out );
+									curl_exec( $ch );
+									curl_close( $ch );
+									fclose( $out );
+								} else {
+									copy( $source, $filename );
+								}
+							}
+
+							if( file_exists( $filename ) ) {
+								$content = $attribute->attribute( 'content' );
+								$content->initializeFromFile( $filename, isset( $arr[1] ) ? $arr[1] : null );
+								$content->store( $attribute );
+								unlink( $filename );
+							}
 						}
 
 						break;
